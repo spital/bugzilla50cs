@@ -1,0 +1,98 @@
+[%# This Source Code Form is subject to the terms of the Mozilla Public
+  # License, v. 2.0. If a copy of the MPL was not distributed with this
+  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  #
+  # This Source Code Form is "Incompatible With Secondary Licenses", as
+  # defined by the Mozilla Public License, v. 2.0.
+  #%]
+
+[% max_local = Param('maxlocalattachment') * 1024 %]
+[% max_limit = Param('maxattachmentsize')> max_local ? Param('maxattachmentsize') : max_local %]
+<tr class="attachment_data">
+  <th><label for="data">Soubor</label>:</th>
+  <td>
+    <em>Vložte cestu k souboru na Vašem počítači</em> (nebo
+    <a id="attachment_data_controller" href="javascript:TUI_toggle_class('attachment_text_field');
+                                             javascript:TUI_toggle_class('attachment_data')"
+    >vložte text jako přílohu</a>).<br>
+    <input type="file" id="data" name="data" size="50" onchange="DataFieldHandler()">
+    <br><em>(Limit velikosti souboru: [% max_limit FILTER html %] KB)</em>
+  </td>
+</tr>
+<tr class="attachment_text_field">
+  <th><label for="attach_text">Soubor</label>:</th>
+  <td>
+    <em>Vložte text, který bude přidán jako příloha</em> (nebo
+    <a id="attachment_text_field_controller" href="javascript:TUI_toggle_class('attachment_text_field');
+                                                   javascript:TUI_toggle_class('attachment_data')"
+    >připojte soubor</a>).<br>
+    <textarea id="attach_text" name="attach_text" cols="80" rows="15"
+              onkeyup="TextFieldHandler()" onblur="TextFieldHandler()"></textarea>
+  </td>
+</tr>
+<tr>
+  <th class="required"><label for="description">Popis</label>:</th>
+  <td>
+    <em>Popište stručně přílohu.</em><br>
+    <input type="text" id="description" name="description" class="required"
+           size="60" maxlength="200">
+  </td>
+</tr>
+<tr[% ' class="expert_fields"' UNLESS bug.id %]>
+  <th>Typ souboru:</th>
+  <td>
+    <em>Pokud je přílohou záplata(patch), zaškrtněte políčko níže.</em><br>
+    <input type="checkbox" id="ispatch" name="ispatch" value="1"
+           onchange="setContentTypeDisabledState(this.form);">
+    <label for="ispatch">patch</label><br><br>
+    [%# Reset this whenever the page loads so that the JS state is up to date %]
+    <script type="text/javascript">
+      YAHOO.util.Event.onDOMReady(function() {
+          bz_fireEvent(document.getElementById('ispatch'), 'change');
+      });
+    </script>
+
+    <em>Jinak zvolte metodu jak zjistit typ přílohy.</em><br>
+    <input type="radio" id="autodetect"
+           name="contenttypemethod" value="autodetect" checked="checked">
+      <label for="autodetect">autodetekce</label><br>
+    <input type="radio" id="list"
+           name="contenttypemethod" value="list">
+      <label for="list">zvolit ze seznamu</label>:
+      <select name="contenttypeselection" id="contenttypeselection"
+              onchange="this.form.contenttypemethod[1].checked = true;">
+        [% PROCESS content_types %]
+      </select><br>
+    <input type="radio" id="manual"
+                 name="contenttypemethod" value="manual">
+      <label for="manual">zadat ručně</label>:
+      <input type="text" name="contenttypeentry" id="contenttypeentry"
+             size="30" maxlength="200"
+             onchange="if (this.value) this.form.contenttypemethod[2].checked = true;">
+  </td>
+</tr>
+<tr[% ' class="expert_fields"' UNLESS bug.id %]>
+  <td> </td>
+  <td>
+    [% IF flag_types && flag_types.size > 0 %]
+      [% PROCESS "flag/list.html.tmpl" %]<br>
+    [% END %]
+  </td>
+</tr>
+
+[% BLOCK content_types %]
+  [% mimetypes = [{type => "text/plain", desc => "textový soubor"},
+                  {type => "text/html",  desc => "HTML stránka"},
+                  {type => "application/xml", desc => "XML soubor"},
+                  {type => "image/gif",  desc => "GIF obrázek"},
+                  {type => "image/jpeg", desc => "JPEG obrázek"},
+                  {type => "image/png",  desc => "PNG obrázek"},
+                  {type => "application/pdf", desc => "PDF dokument"},
+                  {type => "application/octet-stream", desc => "binární soubor"}]
+  %]
+  [% Hook.process("mimetypes", "attachment/createformcontents.html.tmpl") %]
+
+  [% FOREACH m = mimetypes %]
+    <option value="[% m.type FILTER html %]">[% m.desc FILTER html %] ([% m.type FILTER html %])</option>
+  [% END %]
+[% END %]

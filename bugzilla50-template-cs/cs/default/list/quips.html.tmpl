@@ -1,0 +1,145 @@
+[%# This Source Code Form is subject to the terms of the Mozilla Public
+  # License, v. 2.0. If a copy of the MPL was not distributed with this
+  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  #
+  # This Source Code Form is "Incompatible With Secondary Licenses", as
+  # defined by the Mozilla Public License, v. 2.0.
+  #%]
+
+[%# INTERFACE:
+  # added_quip: string. Defined if the CGI added a quip data before
+  #                displaying anything; if defined, its value is that quip.
+  # show_quips: boolean. True if we are showing the entire quip list.
+  # quips: list of strings. Defined if and only if show_quips is true.
+  #                List of all quips.
+  #%]
+
+[% PROCESS global/header.html.tmpl
+           title = "$terms.Bugzilla - Správa bonmotů"
+           header = "Přidejte vlastní moudrý titulek"
+           style_urls = ['skins/standard/buglist.css']
+ %]
+
+<p>
+  [% terms.Bugzilla %] zobrazí náhodný bonmot v titulku každého seznamu
+  [% terms.bugsu %].
+</p>
+
+[% IF Param("quip_list_entry_control") != "closed" %]
+  <p>
+    Můžete přidat bonmot. Napište moudrý, vtipný a nebo nudný bonmot
+    (vyhněte se prosím obscéním nebo urážlivých bonmotům) a udeřte tlačítko.
+    [% IF Param("quip_list_entry_control") == "moderated" AND !user.in_group('bz_quip_moderators') %]
+      Váš bonmot bude před použitím nejprve schválen.
+    [% END %]
+  </p>
+
+  <form method="post" action="quips.cgi">
+    <input type="hidden" name="action" value="add">
+    <input type="hidden" name="token"
+           value="[% issue_hash_token(['create-quips']) FILTER html %]">
+    <input size="80" name="quip" maxlength="512" required>
+    <p>
+      <input type="submit" id="add" value="Přidat bonmot">
+    </p>
+  </form>
+[% ELSE %]
+  <p>Žádné nové bonmoty nemohou být nyní přidány.
+  </p>
+[% END %]
+
+[% IF show_quips %]
+  [% IF !user.in_group('bz_quip_moderators') %]
+    <h2>
+      Vložené bonmoty:
+    </h2>
+    <ul>
+      [% FOREACH quipid = quipids %]
+        [% NEXT IF NOT quips.$quipid.approved %]
+        <li>[% quips.$quipid.quip FILTER html %]</li>
+      [% END %]
+    </ul>
+  [% ELSE %]
+    <h2>Úprava bonmotů:</h2>
+    <p>
+      <strong>Poznámka:</strong> Pouze schválené bonmoty budou zobrazeny.
+      Jestliže parametr 'quip_list_entry_control' je nastaven na hodnotu <q>open</q>, 
+      vložené bonmoty budou automaticky schváleny.
+    </p>
+    <form name="editform" method="post" action="quips.cgi">
+      <input type="hidden" name="action" value="approve">
+      <input type="hidden" name="token"
+             value="[% issue_hash_token(['approve-quips']) FILTER html %]">
+      <table id="quips">
+        <thead>
+        <tr class="column_header">
+          <th>Bonmot</th>
+          <th>Autor</th>
+          <th>Akce</th>
+          <th>Schváleno</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        [% FOREACH quipid = quipids %]
+          <tr>
+            <td>[% quips.$quipid.quip FILTER html %]</td>
+            <td>
+              [% userid = quips.$quipid.userid  %]
+              [% users.$userid FILTER html      %]
+              [% "Neznámý" IF NOT users.$userid %]
+            </td>
+            <td>
+              <a href="quips.cgi?action=delete&amp;quipid=[% quipid FILTER uri %]&amp;token=
+                 [%- issue_hash_token(['quips', quipid]) FILTER uri %]">
+                Delete
+              </a>
+            </td>
+            <td class="center">
+              <input type="hidden" name="defined_quipid_[% quipid FILTER html %]"
+                     id="defined_quipid_[% quipid FILTER html %]"
+                     value="1">
+              <input type="checkbox" name="quipid_[% quipid FILTER html %]"
+                     id="quipid_[% quipid FILTER html %]"
+                     [%- ' checked="checked"' IF quips.$quipid.approved %]>
+            </td>
+          </tr>
+        [% END %]
+        </tbody>
+      </table>
+
+      <input type="button" id="uncheck_all" value="Odznač vše"
+             class="bz_default_hidden" onclick="SetCheckboxes(false);">
+      <input type="button" id="check_all" value="Zatrhni vše"
+             class="bz_default_hidden" onclick="SetCheckboxes(true);">
+      <input type="submit" id="update" value="Ulož změny">
+
+      <script type="text/javascript">
+        <!--
+        var numelements = document.forms.editform.elements.length;
+        function SetCheckboxes(value) {
+          var item;
+          for (var i=0 ; i<numelements ; i++) {
+            item = document.forms.editform.elements[i];
+            item.checked = value;
+          }
+        }
+        YAHOO.util.Dom.removeClass("check_all", "bz_default_hidden");
+        YAHOO.util.Dom.removeClass("uncheck_all", "bz_default_hidden");
+        //-->
+      </script>
+    </form>
+    <br>
+  [% END %]
+[% ELSE %]
+  <p>
+    Ti, kdož mají rádi moudrost ve velkých dávkách, mohou
+    <a href="quips.cgi?action=show">prohlížet
+    [% IF user.in_group('bz_quip_moderators') %]
+      a upravovat
+    [% END %]
+    celý seznam bonmotů</a>.
+  </p>
+[% END %]
+
+[% PROCESS global/footer.html.tmpl %]

@@ -1,0 +1,31 @@
+[%# This Source Code Form is subject to the terms of the Mozilla Public
+  # License, v. 2.0. If a copy of the MPL was not distributed with this
+  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  #
+  # This Source Code Form is "Incompatible With Secondary Licenses", as
+  # defined by the Mozilla Public License, v. 2.0.
+  #%]
+
+[%# INTERFACE:
+  # url: URL to a pre-filled bug entry form.
+  # short_desc: Bug summary as entered in the form.
+  #%]
+
+[% PROCESS global/header.html.tmpl
+  title = "Záložka pro záznam $terms.bugu"
+  header = "Předloha sestavena"
+%]
+
+<p>
+  Jako záložku si uložte tento odkaz:
+  &ldquo;<a href="enter_bug.cgi?[% url FILTER html %]">
+  [% IF short_desc %]
+    [% short_desc FILTER html %]
+  [% ELSE %]
+    [% terms.Bug %] předloha záznamu
+  [% END %]</a>&rdquo;.
+  Tato záložka vás zavede na formulář <em>Vložte [% terms.bug %]</em>
+  s přednastavenými hodnotami dle požadavků.
+</p>
+
+[% PROCESS global/footer.html.tmpl %]

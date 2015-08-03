@@ -1,0 +1,46 @@
+
+### copy this script to BugzillaROOT/template
+# to create a patch for CS bugzilla :
+#
+# diff -rBd -U1 ./en/default/ ./cs/default >patchFile
+
+
+###########
+# createCsFromPatch
+# first copy script to BugzillaROOT/template, then run :
+# (1) searches patchFile and copy files to a new cs dir
+# (2) applies the patch
+
+
+# export PATCHF=bz424eng2cs.patch
+export PATCHF=$1
+if [ "$PATCHF" == "" ] || [ ! -f $PATCHF ];then
+  echo "Patch file '$PATCHF' empty or not present ... exit"
+  exit 1
+fi
+grep "^diff" $PATCHF | cut -d' ' -f4 | while read fn;do
+DNAMen=$(dirname $fn)
+DNAMcs=$(echo $DNAMen | sed -e 's#^\./en#./cs#')
+FNAM=$(basename $fn)
+mkdir -p $DNAMcs
+cp $fn $DNAMcs
+done
+
+cd cs
+FI=patch.result
+patch -l --backup-if-mismatch -p2 < ../$PATCHF 2>&1 | tee ../$FI
+cd ..
+FF="FAILED at"
+# grep "$FF" $FI
+printf "== Failed hunks count : %d ==\n\n" $(grep -c "$FF" $FI)
+SA="FAILED -- saving rejects to file"
+printf "== Rejects file count : %d ==\n\n" $(grep "$SA" $FI | sed -e "s/$SA/:/" | wc -l)
+
+# b2=~/Downloads/my.dev/bz50/bugzilla-5.0/template
+# b1=~/Downloads/my.dev/bugzilla-4.4.9/template
+# F=default/global/common-links.html.tmpl
+# nohup meld $b2/en/$F $b2/cs/$F $b1/cs/$F &
+
+# F=default/account/auth/login-small.html.tmpl
+# dwdiff -C1 -m3 -c -P -W "\t\n\ "  cs/$F en/$F
+# mdiff -0 cs/$F en/$F

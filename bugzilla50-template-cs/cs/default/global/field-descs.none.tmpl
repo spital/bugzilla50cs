@@ -1,0 +1,146 @@
+[%# This Source Code Form is subject to the terms of the Mozilla Public
+  # License, v. 2.0. If a copy of the MPL was not distributed with this
+  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  #
+  # This Source Code Form is "Incompatible With Secondary Licenses", as
+  # defined by the Mozilla Public License, v. 2.0.
+  #%]
+
+[%# Remember to PROCESS rather than INCLUDE this template. %]
+
+[% SET search_descs = {
+  "noop"           => "---",
+  "equals"         => "rovná se",
+  "notequals"      => "nerovná se",
+  "anyexact"       => "rovná se jakémukoli z řetězců",
+  "substring"      => "obsahuje řetězec",
+  "casesubstring"  => "obsahuje řetězec (exact case)",
+  "notsubstring"   => "neobsahuje řetězec",
+  "anywordssubstr" => "obsahuje jakýkoli z řetězců",
+  "allwordssubstr" => "obsahuje všechny řetězce",
+  "nowordssubstr"  => "neobsahuje žádný z řetězců",
+  "regexp"         => "odpovídá regulárnímu výrazu",
+  "notregexp"      => "neodpovídá regulárnímu výrazu",
+  "lessthan"       => "je menší než",
+  "lessthaneq"     => "je menší nebo rovno",
+  "greaterthan"    => "je větší než",
+  "greaterthaneq"  => "je větší nebo rovno",
+  "anywords"       => "obsahuje jakékoli ze slov",
+  "allwords"       => "obsahuje všechna slova",
+  "nowords"        => "neobsahuje žádné ze slov",
+  "changedbefore"  => "změněno před",
+  "changedafter"   => "změněno po",
+  "changedfrom"    => "změněno z",
+  "changedto"      => "změněno na",
+  "changedby"      => "změněno kým",
+  "matches"        => "odpovídá",
+  "notmatches"     => "neodpovídá",
+  "isempty"        => "je prázdný",
+  "isnotempty"     => "není prázdný",
+} %]
+
+[% field_types = { ${constants.FIELD_TYPE_UNKNOWN}       => "Neznámý typ",
+                   ${constants.FIELD_TYPE_FREETEXT}      => "Volný text",
+                   ${constants.FIELD_TYPE_INTEGER}       => "Celé číslo",
+                   ${constants.FIELD_TYPE_SINGLE_SELECT} => "Rozbalovací menu",
+                   ${constants.FIELD_TYPE_MULTI_SELECT}  => "Vícenásobný výběr",
+                   ${constants.FIELD_TYPE_TEXTAREA}      => "Rozměrné textové pole",
+                   ${constants.FIELD_TYPE_DATETIME}      => "Datum/čas",
+                   ${constants.FIELD_TYPE_BUG_ID}        => "Číslo $terms.bugu",
+                } %]
+
+[% IF in_template_var %]
+  [% PROCESS "global/value-descs.none.tmpl" %]
+  [% SET vars.value_descs = value_descs %]
+  [% SET vars.terms = terms %]
+
+  [%# field_descs is loaded as a global template variable and cached
+    # across all templates--see VARIABLES in Bugzilla/Template.pm.
+    #%]
+  [% vars.field_descs = {
+    "[Bug creation]"          => "[Zadání $terms.bugu]",
+     "actual_time"             => "Odpracováno",
+     "alias"                   => "Alias",
+     "assigned_to"             => "Příjemce",
+     "assigned_to_realname"    => "Podpis příjemce",
+     "attach_data.thedata"     => "Příloha",
+     "attachments.description" => "Popis přílohy",
+     "attachments.filename"    => "Název souboru přílohy",
+     "attachments.mimetype"    => "MIME typ přílohy",
+     "attachments.ispatch"     => "Příloha je záplata(patch)",
+     "attachments.isobsolete"  => "Příloha je překonaná",
+     "attachments.isprivate"   => "Příloha je důvěrná",
+     "attachments.submitter"   => "Autor přílohy",
+     "blocked"                 => "Blokuje",
+     "bug_file_loc"            => "URL",
+     "bug_group"               => "Skupina",
+     "bug_id"                  => "ID $terms.bugu",
+     "bug_severity"            => "Závažnost",
+     "bug_status"              => "Stav",
+     "changeddate"             => "Změněno",
+     "cc"                      => "Kopie",
+     "classification"          => "Klasifikace",
+     "cclist_accessible"       => "Seznam Do kopie(CC) přístupný",
+     "commenter"               => "Komentující",
+     "component_id"            => "ID komponenty",
+     "component"               => "Komponenta",
+     "content"                 => "Obsah",
+     "creation_ts"             => "Datum vytvoření",
+     "days_elapsed"            => "Počet dní od poslední změny požadavku",
+     "deadline"                => "Termín",
+     "delta_ts"                => "Změněno",
+     "dependson"               => "Závisí na",
+     "dup_id"                  => "Duplikát",
+     "estimated_time"          => "Pův. odhad",
+     "everconfirmed"           => "Potvrzeno",
+     "flagtypes.name"          => "Příznaky",
+     "keywords"                => "Klíčová slova",
+     "last_visit_ts"           => "Poslední návštěva",
+     "longdesc"                => "Komentář",
+     "longdescs.count"         => "Počet komentářů",
+     "longdescs.isprivate"     => "Komentář je důvěrný",
+     "newcc"                   => "Kopie",
+     "op_sys"                  => "Oper. systém",
+     "opendate"                => "Otevřeno",
+     "owner_idle_time"         => "Doba nečinnosti",
+     "percentage_complete"     => "Hotovo %",
+     "priority"                => "Priorita",
+     "product_id"              => "ID produktu",
+     "product"                 => "Produkt",
+     "qa_contact"              => "QA-kontakt",
+     "qa_contact_realname"     => "QA-jméno kontaktu",
+     "remaining_time"          => "Zbývá hodin",
+     "rep_platform"            => "Hardware",
+     "reporter"                => "Nahlásil",
+     "reporter_accessible"     => "Oznamovatel dostupný",
+     "reporter_realname"       => "Jméno oznamovatele",
+     "requestees.login_name"   => "Příznak žadatele",
+     "resolution"              => "Řešení",
+     "see_also"                => "Viz také",
+     "setters.login_name"      => "Příznak nastavil",
+     "setting"                 => "Nastavení",
+     "settings"                => "Nastavení",
+     "short_desc"              => "Předmět",
+     "short_short_desc"        => "Předmět",
+     "status_whiteboard"       => "Tabule",
+     "tag"                     => "Osobní značky",
+     "target_milestone"        => "Milník",
+     "version"                 => "Verze",
+     "work_time"               => "Odpracováno hodin",
+  } %]
+
+  [%# Also include any custom fields or fields which don't have a
+      Description here, by copying their Description from the
+      database. If you want to override this for your language
+      or your installation, just use a hook. %]
+  [% UNLESS Param('shutdownhtml') %]
+    [% FOREACH bz_field = bug_fields.values %]
+      [% SET vars.field_descs.${bz_field.name} = bz_field.description
+         IF !vars.field_descs.${bz_field.name}.defined %]
+    [% END %]
+  [% END %]
+
+  [% PROCESS "bug/field-help.none.tmpl" %]
+[% END %]
+
+[% Hook.process("end") %]

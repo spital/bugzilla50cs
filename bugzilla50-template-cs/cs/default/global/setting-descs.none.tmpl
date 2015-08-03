@@ -1,0 +1,50 @@
+[%# This Source Code Form is subject to the terms of the Mozilla Public
+  # License, v. 2.0. If a copy of the MPL was not distributed with this
+  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  #
+  # This Source Code Form is "Incompatible With Secondary Licenses", as
+  # defined by the Mozilla Public License, v. 2.0.
+  #%]
+
+[%# Remember to PROCESS rather than INCLUDE this template. %]
+
+[% setting_descs = { 
+   "comment_sort_order"               => "Při prohlížení $terms.bugsu zobrazit komentáře v tomto pořadí",
+   "csv_colsepchar"                   => "Znak oddělující pole v CSV souborech",
+   "display_quips"                    => "Zobrazovat bonmot v hlavičce každého seznamu $terms.bugsu",
+   "zoom_textareas"                   => "Zvětšovat textová pole při jejich použití (vyžaduje JavaScript)",
+   "newest_to_oldest"                 => "Sestupně",
+   "newest_to_oldest_desc_first"      => "Sestupně, ale popis nechat nahoře",
+   "off"                              => "Vypnuto",
+   "oldest_to_newest"                 => "Vzestupně",
+   "on"                               => "Zapnuto",
+   "post_bug_submit_action"           => "Po změně $terms.bugu",
+   "next_bug"                         => "Zobrazit další $terms.bug v seznamu",
+   "same_bug"                         => "Zobrazit změněný $terms.bug",
+   "standard"                         => "Klasický",
+   "skin"                             => "Obecný vzhled (skin) systému $terms.Bugzilla",
+   "nothing"                          => "Nedělat nic",
+   "state_addselfcc"                  => "Automaticky mě přidat do pole Kopie $terms.bugsu, které změním ",
+   "always"                           => "Vždy",
+   "never"                            => "Nikdy",
+   "cc_unless_role"                   => "Pouze pokud v nich nemám žádné role",
+   "lang"                             => "Jazyk, použitý v e-mailech",
+   "quote_replies"                    => "Vkládat citaci, když odpovídám na komentář",
+   "quoted_reply"                     => "Citovat celý komentář",
+   "simple_reply"                     => "Odkazovat se pouze číslem komentáře",
+   "comment_box_position"             => "Pozice rámečku s přídavnými komentáři",
+   "before_comments"                  => "Před ostatními komentáři",
+   "after_comments"                   => "Za ostatními komentáři",
+   "timezone"                         => "Časová zóna použitá při výpisu datumů a časů",
+   "local"                            => "Stejná jako na serveru",
+   "quicksearch_fulltext"             => "Při rychlém hledání prohledávat komentáře (pomalejší)",
+   "email_format"                     => "Formát emailů",
+   "html"                             => "HTML",
+   "text_only"                        => "Prostý text",
+   "requestee_cc"                     => "Přidat mě automaticky do kopie. Chci revidovat $terms.bugs",
+   "bugmail_new_prefix"               => "Přidat 'Nový:' do předmětu emailu poslaného když je vytvořen nový $terms.bug",
+   "possible_duplicates"              => "Zobraz možné duplicity při reportu nového $terms.bugu",
+                   } 
+%]
+
+[% Hook.process('settings') %]

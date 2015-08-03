@@ -1,0 +1,75 @@
+[%# This Source Code Form is subject to the terms of the Mozilla Public
+  # License, v. 2.0. If a copy of the MPL was not distributed with this
+  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  #
+  # This Source Code Form is "Incompatible With Secondary Licenses", as
+  # defined by the Mozilla Public License, v. 2.0.
+  #%]
+
+[%# INTERFACE:
+  # This template has no interface. It's a list of the available report
+  # types in Bugzilla.
+  #%]
+
+[% PROCESS global/header.html.tmpl
+  title = "Kuchyně sestav a grafů"
+  doc_section = "using/reports-and-charts.html"
+  style_urls = ['skins/standard/buglist.css']
+%]
+
+<p>
+  [% terms.Bugzilla %] vám umožňuje sledovat a prohlížet [% terms.bugs %] a stav databáze
+  mnoha vzrušujícími způsoby.
+</p>
+
+<h2>Aktuální stav</h2>
+
+<ul>
+  <li id="report_search">
+    <strong><a href="query.cgi">Hledání</a></strong> -
+    vypiš množiny [% terms.bugsu %].
+  </li>
+  <li id="report_tabular">
+    <strong>
+      <a href="query.cgi?format=report-table">Sestavy</a>
+    </strong> -
+    zobrazí seznamy a počty [% terms.bugsu %] v 1, 2 nebo 3 rozměrech jako HTML nebo CSV.
+  </li>
+  [% IF feature_enabled('graphical_reports') %]
+    <li id="report_graphical">
+      <strong>
+        <a href="query.cgi?format=report-graph">Grafy</a>
+      </strong> -
+      vykreslí spojnicové, sloupcové či koláčové grafy.
+    </li>
+  [% END %]
+  <li id="report_duplicates">
+    <strong><a href="duplicates.cgi">Duplikáty</a></strong> -
+    vypíše [% terms.bugs %], které jsou často nahlášeny.
+  </li>
+  [% Hook.process('current_state') %]
+</ul>
+
+[% IF feature_enabled('new_charts') OR feature_enabled('old_charts') %]
+  <h2>Změny v čase</h2>
+
+  <ul>
+    [% IF feature_enabled('old_charts') %]
+      <li id="old_charts">
+        <strong><a href="reports.cgi">Stará verze grafů</a></strong> - 
+        vykreslí stav nebo řešení [% terms.bugsu %] v
+        čase pro jednotlivé produkty v databázi.
+      </li>
+    [% END %]
+    [% IF feature_enabled('new_charts') AND user.in_group(Param("chartgroup")) %]
+      <li id="new_charts">
+        <strong><a href="chart.cgi">Nová verze grafů</a></strong> - 
+        vykreslí výsledky jakéhokoliv vyhledávání v čase. Je opravdu mnohem lepší.
+      </li>
+    [% END %]
+  </ul>
+[% END %]
+
+[% Hook.process('end') %]
+
+[% PROCESS global/footer.html.tmpl %]
